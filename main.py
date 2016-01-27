@@ -12,6 +12,21 @@ from keras.models import Sequential
 from keras.optimizers import RMSprop
 from keras.layers.core import Dense
 
+def find_nearest_neighbor(neighbor, neighborhood):
+    """ Calculates the nearest neighbor for a given array
+    >>> find_nearest_neighbor([1,1],[[1,2], [2,2], [0,0]])
+    [0, 0]
+    """
+    nearest_neighbor = (0, np.inf)
+    for n in neighborhood:
+        n_dist = (n, neighbor_distance(neighbor, n))
+        if n_dist < nearest_neighbor[1]:
+            nearest_neighbor = (n, n_dist)
+    return nearest_neighbor[0]
+
+def neighbor_distance(x1, x2):
+    """ :return: distance of the two scalars or matrices in l2/frobenius norm """
+    return np.linalg.norm(np.subtract(x1,x2))
 
 def run_deep_autoencoder():
     """
