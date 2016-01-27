@@ -5,6 +5,7 @@ Module docsting
 from __future__ import absolute_import
 from __future__ import print_function
 import numpy as np
+import matplotlib.pyplot as plt
 
 from keras.datasets import mnist
 from keras.models import Sequential
@@ -31,6 +32,20 @@ def run_deep_autoencoder():
     print(x_train.shape[0], 'train samples')
     print(x_test.shape[0], 'test samples')
 
+bottle_neck = 500
+
+activation_fnc = 'relu'
+
+def compare_autoencoder_outputs(imgs, model, indices=[0], img_dim=(28,28)):
+    pred = model.predict(imgs)
+    for i in indices:
+        tup = (imgs[i].reshape(img_dim),pred[i].reshape(img_dim))
+        plt.matshow(tup[0])
+        plt.matshow(tup[1])
+    plt.show()
+
+
+def run_deep_autoencoder():
     img_dim = 28*28
     bottle_neck = 100
     encoder_dim = 250
@@ -52,6 +67,7 @@ def run_deep_autoencoder():
 
     # validation mit nearest neighbor
     # bottleneck small
+    compare_autoencoder_outputs(X_test, model, indices=[1,2,3,4])
 
 if __name__ == "__main__":
     run_deep_autoencoder()
