@@ -38,11 +38,11 @@ def run_deep_autoencoder():
     """
     np.random.seed(1337)  # for reproducibility
     img_dim = 28*28
-    bottle_neck = 100
+    bottle_neck = 50
     encoder_dim = 250
-    decoder_dim = 200
+    decoder_dim = 250
     batch_size = 128
-    nb_epoch = 2
+    nb_epoch = 100
     activation_fnc = 'relu'
 
     # the data, shuffled and split between train and test sets
@@ -52,8 +52,8 @@ def run_deep_autoencoder():
     x_train = x_train.astype("float32") / 255.0
     x_test = x_test.astype("float32") / 255.0
 
-    x_train = x_train[0:1000, :]
-    x_test = x_test[0:1000, :]
+    # x_train = x_train[0:1000, :]
+    # x_test = x_test[0:1000, :]
 
     print(x_train.shape[0], 'train samples')
     print(x_test.shape[0], 'test samples')
