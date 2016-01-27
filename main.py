@@ -1,7 +1,9 @@
 from __future__ import absolute_import
 from __future__ import print_function
 import numpy as np
+import matplotlib.pyplot as plt
 np.random.seed(1) # for reproducibility
+
 
 from keras.datasets import mnist
 from keras.models import Sequential
@@ -20,8 +22,8 @@ X_test = X_test.reshape(-1, 784)
 X_train = X_train.astype("float32") / 255.0
 X_test = X_test.astype("float32") / 255.0
 
-#X_train = X_train[0:1000,:]
-#X_test = X_test[0:1000,:]
+X_train = X_train[0:1000,:]
+X_test = X_test[0:1000,:]
 
 print(X_train.shape[0], 'train samples')
 print(X_test.shape[0], 'test samples')
@@ -29,6 +31,15 @@ print(X_test.shape[0], 'test samples')
 bottle_neck = 500
 
 activation_fnc = 'relu'
+
+def compare_autoencoder_outputs(imgs, model, indices=[0], img_dim=(28,28)):
+    pred = model.predict(imgs)
+    for i in indices:
+        tup = (imgs[i].reshape(img_dim),pred[i].reshape(img_dim))
+        plt.matshow(tup[0])
+        plt.matshow(tup[1])
+    plt.show()
+
 
 def run_deep_autoencoder():
     img_dim = 28*28
@@ -48,6 +59,9 @@ def run_deep_autoencoder():
 
     # validation mit nearest neighbor
     # bottleneck small
+    compare_autoencoder_outputs(X_test, model, indices=[1,2,3,4])
+
+
 
 def run_non_ae():
 
@@ -59,8 +73,6 @@ def run_non_ae():
     np.random.seed(0)
     model.fit(X_train,X_train, nb_epoch=nb_epoch, batch_size=batch_size,
                 validation_data=(X_test, X_test), show_accuracy=False)
-    y_image0 = model.predict(X_test)[0]
-    x_image0 = X_test[0]
 
 def run_ae():
     #creating the autoencoder
