@@ -7,7 +7,6 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 from keras.datasets import mnist
 from keras.models import Sequential
 from keras.optimizers import RMSprop
@@ -54,11 +53,11 @@ def run_deep_autoencoder():
     """
     np.random.seed(1337)  # for reproducibility
     img_dim = 28*28
-    bottle_neck = 16
+    bottle_neck = 100
     encoder_dim = 250
     decoder_dim = 200
     batch_size = 128
-    nb_epoch = 5
+    nb_epoch = 2
     activation_fnc = 'relu'
 
     # the data, shuffled and split between train and test sets
