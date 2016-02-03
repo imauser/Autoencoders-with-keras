@@ -27,7 +27,7 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=
     encoder_dim = 250
     decoder_dim = 250
     batch_size = 128
-    nb_epoch = 10
+    nb_epoch = 100
     activation_fnc = 'relu'
 
     # the data, shuffled and split between train and test sets
@@ -68,18 +68,16 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=
 
     neighborhood = encoder.predict(x_train)
     #neighbor = encoder.predict(x_train[1:2,:])
-    testindex = 20
-    neighbor = encoder.predict(x_test[testindex: testindex+1,:])
 
-    # neighbor shapes
-    print(str(neighborhood.shape))
-    print(str(neighbor.shape))
+    correct = 0.
+    for testindex in range(len(x_test)):
+        neighbor = encoder.predict(x_test[testindex: testindex+1,:])
+        i = find_nearest_neighbor_index(neighbor, neighborhood)
+        if y_train[i][0] == y_test[testindex][0]:
+            correct += 1.
+    precision = correct / len(x_test)
+    print("Precision: " + str(round(precision, 3)))
 
-    i = find_nearest_neighbor_index(neighbor, neighborhood)
-    print('index:' + str(i))
-    plt.matshow(x_test[testindex].reshape(img_shape))
-    print('Predicted as: ' + classes[y_train[i][0]] + ', labeled as: ' + classes[y_test[testindex][0]])
-    plt.show()
 
 def compare_autoencoder_outputs(imgs, model, indices=[0], img_dim=(28, 28)):
     pred = model.predict(imgs)
