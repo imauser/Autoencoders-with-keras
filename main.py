@@ -14,22 +14,6 @@ from keras.layers.core import Dense
 
 import cPickle
 
-
-def find_nearest_neighbor(neighbor, neighborhood):
-    """ Calculates the nearest neighbor for a given array
-    >>> find_nearest_neighbor([1,1],[[1,2], [2,2], [0,0]])
-    [1, 2]
-    """
-    nearest_neighbor = (0, np.inf)  # (index, distance)
-    for n in neighborhood:
-        n_dist = (n, neighbor_distance(neighbor, n))
-        if n_dist < nearest_neighbor[1]:
-            nearest_neighbor = (n, n_dist)
-    return neighborhood[nearest_neighbor[0]]
-
-
-
-
 def find_nearest_neighbor_index_vectorized(neighbor, neighborhood):
     """ Calculates the nearest neighbor for a given array
     >>> find_nearest_neighbor_index_vectorized([1,1],[[1,2], [2,2], [0,0]])
@@ -47,19 +31,9 @@ def find_nearest_neighbor_index(neighbor, neighborhood):
     nearest_neighbor = (0, np.inf)  # (index, distance)
     for i, n in enumerate(neighborhood):
         n_dist = neighbor_distance(neighbor, n)
-        # print('dist' + str(n_dist) + 'neighbor' + str(neighbor) + ' n ' + str(n))
         if n_dist < nearest_neighbor[1]:
             nearest_neighbor = (i, n_dist)
     return nearest_neighbor[0]
-
-
-def find_nearest_neighbor_faster(neighbor, neighborhood):
-    """ Calculates the nearest neighbor for a given array
-    >>> find_nearest_neighbor_faster([1,1],[[1,2], [2,2], [0,0]])
-    [1, 2]
-    """
-    f = np.vectorize(neighbor_distance, excluded='x2')
-    return neighborhood[np.argmin(f(neighborhood, neighbor).T)]
 
 
 def neighbor_distance(x1, x2):
@@ -128,7 +102,7 @@ def run_deep_autoencoder():
 
     neighborhood = encoder.predict(x_train)
     #neighbor = encoder.predict(x_train[1:2,:])
-    testindex = 10
+    testindex = 20
     neighbor = encoder.predict(x_test[testindex: testindex+1,:])
 
     # neighbor shapes
