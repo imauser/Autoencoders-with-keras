@@ -19,7 +19,7 @@ import cPickle
 
 
 
-def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=16):
+def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=16, classes={1: "happy", 2: "sad", 3 : "frustrated", 4 : "winking"}):
     """
     funcion docsting
     """
@@ -77,11 +77,8 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=
 
     i = find_nearest_neighbor_index(neighbor, neighborhood)
     print('index:' + str(i))
-    # should not be needed anymore
-    # plt.matshow(neighborhood[i].reshape(4,4))
-    # plt.matshow(neighbor.reshape(4,4))
-    plt.matshow(x_train[i].reshape(img_shape))
     plt.matshow(x_test[testindex].reshape(img_shape))
+    print('Predicted as: ' + classes[y_train[i][0]] + ', labeled as: ' + classes[y_test[testindex][0]])
     plt.show()
 
 def compare_autoencoder_outputs(imgs, model, indices=[0], img_dim=(28, 28)):
