@@ -140,12 +140,13 @@ def load_smileys():
 
     np.random.seed(1337)  # for reproducibility
     img_dim = 20*20
-    bottle_neck = 250
+    bottle_neck = 16
     encoder_dim = 250
     decoder_dim = 250
     batch_size = 128
-    nb_epoch = 500
+    nb_epoch = 1000
     activation_fnc = 'relu'
+    init_fnc = 'uniform'
 
     # the data, shuffled and split between train and test sets
     x_train = images[0:900, :]
@@ -164,16 +165,20 @@ def load_smileys():
 
     model = Sequential()
     model.add(Dense(output_dim=encoder_dim, input_dim=img_dim,
-                    activation=activation_fnc, init='uniform'))
+                    activation=activation_fnc, init=init_fnc))
+    # model.add(Dense(output_dim=encoder_dim, activation=activation_fnc,
+    #                 init=init_fnc))
     model.add(Dense(output_dim=bottle_neck, activation=activation_fnc,
-                    init='uniform'))
+                    init=init_fnc))
+
     model.add(Dense(output_dim=decoder_dim, activation=activation_fnc,
-                    init='uniform'))
+                    init=init_fnc))
+    # model.add(Dense(output_dim=decoder_dim, activation=activation_fnc,
+    #                 init=init_fnc))
     model.add(Dense(input_dim=decoder_dim, activation=activation_fnc,
-                    output_dim=img_dim, init='uniform'))
+                    output_dim=img_dim, init=init_fnc))
     model.compile(loss='mean_squared_error',
-                  optimizer=Adam())
-                  #optimizer=Adam(lr=0.01))
+                  optimizer=Adam(lr=0.003))
     model.fit(x_train, x_train, nb_epoch=nb_epoch, batch_size=batch_size,
               validation_data=(x_test, x_test), show_accuracy=False)
 
