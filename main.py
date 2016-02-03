@@ -13,34 +13,10 @@ from keras.optimizers import RMSprop
 from keras.optimizers import Adam
 from keras.layers.core import Dense
 
+from nearestneighbor import find_nearest_neighbor_index
+
 import cPickle
 
-def find_nearest_neighbor_index_vectorized(neighbor, neighborhood):
-    """ Calculates the nearest neighbor for a given array
-    >>> find_nearest_neighbor_index_vectorized([1,1],[[1,2], [2,2], [0,0]])
-    0
-    """
-    f = np.vectorize(neighbor_distance, excluded='x2')
-    return np.argmin(f(neighborhood, neighbor).T)
-
-
-def find_nearest_neighbor_index(neighbor, neighborhood):
-    """ Calculates the nearest neighbor for a given array
-    >>> find_nearest_neighbor_index([1,1],[[1,2], [2,2], [1,1]])
-    2
-    """
-    nearest_neighbor = (0, np.inf)  # (index, distance)
-    for i, n in enumerate(neighborhood):
-        n_dist = neighbor_distance(neighbor, n)
-        if n_dist < nearest_neighbor[1]:
-            nearest_neighbor = (i, n_dist)
-    return nearest_neighbor[0]
-
-
-def neighbor_distance(x1, x2):
-    """ :return: distance of the two scalars or matrices in l2/frobenius norm
-    """
-    return np.linalg.norm(np.subtract(x1, x2))
 
 
 def run_deep_autoencoder():
@@ -127,6 +103,20 @@ def compare_autoencoder_outputs(imgs, model, indices=[0], img_dim=(28, 28)):
     plt.show()
 
 
+def load_smileys_dataset(n_train=900, n_test=99,img_dim=20*20):
+    images, labels = cPickle.load(open("./smiley.pkl", "rb"))
+    x_train = images[0:n_train, :]
+    y_train = labels[0:n_train, :]
+    x_test = images[n_train +1:n_train +1 + n_test, :]
+    x_test = labels[n_train +1:n_train +1 + n_test, :]
+    x_train = x_train.reshape(-1, img_dim)
+    x_test = x_test.reshape(-1, img_dim)
+
+    x_train = x_train.astype("float32") / 255.0
+    x_test = x_test.astype("float32") / 255.0
+
+    return (x_train, y_train) , (x_test, y_test)
+
 def load_smileys():
     """load smileys
 
@@ -135,6 +125,7 @@ def load_smileys():
 
     """
     images, lables = cPickle.load(open("./smiley.pkl", "rb"))
+    print(str(lables.shape))
     print("images")
     print(len(images))
 
@@ -180,5 +171,5 @@ def load_smileys():
     # compare_autoencoder_outputs(x_test, model, indices=[1, 2, 3, 4], img_dim=(20, 20))
 
 if __name__ == "__main__":
-    # run_deep_autoencoder()
+    #run_deep_autoencoder()
     load_smileys()
