@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from keras.datasets import mnist
 from keras.models import Sequential
 from keras.optimizers import RMSprop
+from keras.optimizers import Adam
 from keras.layers.core import Dense
 
 import cPickle
@@ -102,23 +103,23 @@ def run_deep_autoencoder():
 
     encoder.compile(loss='mean_squared_error',
                   optimizer=RMSprop())
-# °;ö;°    # sanity checking weights
-# °;ö;°    print(all((model.layers[0].get_weights()[1] == encoder.layers[0].get_weights()[1])))
-# °;ö;°    print(all((model.layers[1].get_weights()[1] == encoder.layers[1].get_weights()[1])))
-# °;ö;°
-# °;ö;°    neighborhood = encoder.predict(x_train)
-# °;ö;°    neighbor = encoder.predict(x_train[1:2,:])
-# °;ö;°
-# °;ö;°    # sanity checking predict
-# °;ö;°    plt.matshow(neighborhood[1].reshape((4,4)))
-# °;ö;°    plt.matshow(neighbor.reshape((4,4)))
-# °;ö;°
-# °;ö;°    i = find_nearest_neighbor_index(neighbor, neighborhood)
-# °;ö;°    plt.matshow(neighbor.reshape(4,4))
-# °;ö;°    plt.matshow(neighborhood[1].reshape(4,4))
-# °;ö;°    plt.matshow(x_train[i].reshape((28,28)))
-# °;ö;°    plt.matshow(x_train[1].reshape((28,28)))
-# °;ö;°    plt.show()
+#     # sanity checking weights
+#     print(all((model.layers[0].get_weights()[1] == encoder.layers[0].get_weights()[1])))
+#     print(all((model.layers[1].get_weights()[1] == encoder.layers[1].get_weights()[1])))
+# 
+#     neighborhood = encoder.predict(x_train)
+#     neighbor = encoder.predict(x_train[1:2,:])
+# 
+#     # sanity checking predict
+#     plt.matshow(neighborhood[1].reshape((4,4)))
+#     plt.matshow(neighbor.reshape((4,4)))
+# 
+#     i = find_nearest_neighbor_index(neighbor, neighborhood)
+#     plt.matshow(neighbor.reshape(4,4))
+#     plt.matshow(neighborhood[1].reshape(4,4))
+#     plt.matshow(x_train[i].reshape((28,28)))
+#     plt.matshow(x_train[1].reshape((28,28)))
+#     plt.show()
 
 def compare_autoencoder_outputs(imgs, model, indices=[0], img_dim=(28, 28)):
     pred = model.predict(imgs)
@@ -142,16 +143,16 @@ def load_smileys():
 
     np.random.seed(1337)  # for reproducibility
     img_dim = 20*20
-    bottle_neck = 250
-    encoder_dim = 250
-    decoder_dim = 250
+    bottle_neck = 16
+    encoder_dim = 100
+    decoder_dim = 100
     batch_size = 128
-    nb_epoch = 500
+    nb_epoch = 2000
     activation_fnc = 'relu'
 
     # the data, shuffled and split between train and test sets
-    x_train = images[0:800, :]
-    x_test = images[801:999, :]
+    x_train = images[0:900, :]
+    x_test = images[901:999, :]
     x_train = x_train.reshape(-1, 400)
     x_test = x_test.reshape(-1, 400)
     x_train = x_train.astype("float32") / 255.0
@@ -174,7 +175,8 @@ def load_smileys():
     model.add(Dense(input_dim=decoder_dim, activation=activation_fnc,
                     output_dim=img_dim, init='uniform'))
     model.compile(loss='mean_squared_error',
-                  optimizer=RMSprop())
+                  optimizer=Adam())
+                  #optimizer=Adam(lr=0.01))
     model.fit(x_train, x_train, nb_epoch=nb_epoch, batch_size=batch_size,
               validation_data=(x_test, x_test), show_accuracy=False)
 
