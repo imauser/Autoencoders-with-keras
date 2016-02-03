@@ -24,46 +24,36 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=
     funcion docsting
     """
     np.random.seed(1337)  # for reproducibility
-    img_dim = 20*20
-    bottle_neck = 16
     encoder_dim = 250
     decoder_dim = 250
     batch_size = 128
     nb_epoch = 1000
     activation_fnc = 'relu'
     init_fnc = 'uniform'
-
-
-
-    np.random.seed(1337)  # for reproducibility
-    encoder_dim = 250
-    decoder_dim = 250
-    batch_size = 128
-    nb_epoch = 100
-    activation_fnc = 'relu'
+    loss_fnc = 'mean_squared_error'
+    optimizer_fnc = Adam(lr=0.003)
 
     # the data, shuffled and split between train and test sets
     (x_train, y_train), (x_test, y_test) = dataset
 
-    # non-autoencoder
-
     model = Sequential()
     model.add(Dense(output_dim=encoder_dim, input_dim=img_dim,
-                    activation=activation_fnc, init='uniform'))
+                    activation=activation_fnc, init=init_fnc))
+    # model.add(Dense(output_dim=encoder_dim, activation=activation_fnc,
+    #                 init=init_fnc))
     model.add(Dense(output_dim=bottle_neck, activation=activation_fnc,
-                    init='uniform'))
+                    init=init_fnc))
 
     model.add(Dense(output_dim=decoder_dim, activation=activation_fnc,
-                    init='uniform'))
+                    init=init_fnc))
+    # model.add(Dense(output_dim=decoder_dim, activation=activation_fnc,
+    #                 init=init_fnc))
     model.add(Dense(input_dim=decoder_dim, activation=activation_fnc,
-                    output_dim=img_dim, init='uniform'))
-    model.compile(loss='mean_squared_error',
-                  optimizer=RMSprop())
+                    output_dim=img_dim, init=init_fnc))
+    model.compile(loss=loss_fnc,
+                  optimizer=optimizer_fnc)
     model.fit(x_train, x_train, nb_epoch=nb_epoch, batch_size=batch_size,
               validation_data=(x_test, x_test), show_accuracy=False)
-
-    # validation with nearest neighbor
-    #    compare_autoencoder_outputs(x_test, model, indices=[1, 2, 3, 4])
 
     encoder = Sequential()
     for i, layer in enumerate(model.layers):
@@ -71,8 +61,8 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=
             break
         encoder.add(layer)
 
-    encoder.compile(loss='mean_squared_error', optimizer=RMSprop())
-   
+    encoder.compile(loss=loss_fnc, optimizer=optimizer_fnc)
+
     neighborhood = encoder.predict(x_train)
 
     correct = 0.
@@ -117,26 +107,6 @@ def load_smileys_dataset(filename="./smiley.pkl", n_train=900, n_test=99,img_dim
 
     return (x_train, y_train) , (x_test, y_test)
 
-    model = Sequential()
-    model.add(Dense(output_dim=encoder_dim, input_dim=img_dim,
-                    activation=activation_fnc, init=init_fnc))
-    # model.add(Dense(output_dim=encoder_dim, activation=activation_fnc,
-    #                 init=init_fnc))
-    model.add(Dense(output_dim=bottle_neck, activation=activation_fnc,
-                    init=init_fnc))
-
-    model.add(Dense(output_dim=decoder_dim, activation=activation_fnc,
-                    init=init_fnc))
-    # model.add(Dense(output_dim=decoder_dim, activation=activation_fnc,
-    #                 init=init_fnc))
-    model.add(Dense(input_dim=decoder_dim, activation=activation_fnc,
-                    output_dim=img_dim, init=init_fnc))
-    model.compile(loss='mean_squared_error',
-                  optimizer=Adam(lr=0.003))
-    model.fit(x_train, x_train, nb_epoch=nb_epoch, batch_size=batch_size,
-              validation_data=(x_test, x_test), show_accuracy=False)
-
-    # compare_autoencoder_outputs(x_test, model, indices=[1, 2, 3, 4], img_dim=(20, 20))
 
 if __name__ == "__main__":
     data = load_smileys_dataset()
