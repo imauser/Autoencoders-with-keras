@@ -60,14 +60,8 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=
         encoder.add(layer)
 
     encoder.compile(loss='mean_squared_error', optimizer=RMSprop())
-    # sanity checking weights
-    print('Checking if the encoders weights equals\
-            the beginning of the autoencoder')
-    print(all((model.layers[0].get_weights()[1] == encoder.layers[0].get_weights()[1])))
-    print(all((model.layers[1].get_weights()[1] == encoder.layers[1].get_weights()[1])))
 
     neighborhood = encoder.predict(x_train)
-    #neighbor = encoder.predict(x_train[1:2,:])
 
     correct = 0.
     for testindex in range(len(x_test)):
@@ -76,7 +70,7 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=
         if y_train[i][0] == y_test[testindex][0]:
             correct += 1.
     precision = correct / len(x_test)
-    print("Precision: " + str(round(precision, 3)))
+    print("Precision by labels: " + str(round(precision, 3)))
 
 
 def compare_autoencoder_outputs(imgs, model, indices=[0], img_dim=(28, 28)):
