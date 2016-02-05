@@ -13,7 +13,9 @@ from keras.optimizers import RMSprop
 from keras.optimizers import Adam
 from keras.layers.core import Dense
 
-from nearestneighbor import find_nearest_neighbor_index
+from random import shuffle
+
+from nearestneighbor import find_nearest_neighbor_index, find_nearest_class
 
 import cPickle
 
@@ -37,19 +39,22 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=
     (x_train, y_train), (x_test, y_test) = dataset
 
     model = Sequential()
-    model.add(Dense(output_dim=encoder_dim, input_dim=img_dim,
+    model.add(Dense(output_dim=144, input_dim=img_dim,
                     activation=activation_fnc, init=init_fnc))
-    # model.add(Dense(output_dim=encoder_dim, activation=activation_fnc,
-    #                 init=init_fnc))
+    model.add(Dense(output_dim=400, activation=activation_fnc,
+                    init=init_fnc))
     model.add(Dense(output_dim=bottle_neck, activation=activation_fnc,
                     init=init_fnc))
 
-    model.add(Dense(output_dim=decoder_dim, activation=activation_fnc,
-                    init=init_fnc))
-    # model.add(Dense(output_dim=decoder_dim, activation=activation_fnc,
-    #                 init=init_fnc))
-    model.add(Dense(input_dim=decoder_dim, activation=activation_fnc,
+    model.add(Dense(input_dim=bottle_neck, activation=activation_fnc,
                     output_dim=img_dim, init=init_fnc))
+
+#    model.add(Dense(output_dim=decoder_dim, activation=activation_fnc,
+#                    init=init_fnc))
+#    model.add(Dense(output_dim=decoder_dim, activation=activation_fnc,
+#                    init=init_fnc))
+#    model.add(Dense(input_dim=decoder_dim, activation=activation_fnc,
+#                    output_dim=img_dim, init=init_fnc))
     model.compile(loss=loss_fnc,
                   optimizer=optimizer_fnc)
     model.fit(x_train, x_train, nb_epoch=nb_epoch, batch_size=batch_size,
@@ -57,13 +62,15 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=
 
     encoder = Sequential()
     for i, layer in enumerate(model.layers):
-        if i == 2:
+        if i == 3:
             break
         encoder.add(layer)
 
     encoder.compile(loss=loss_fnc, optimizer=optimizer_fnc)
 
     neighborhood = encoder.predict(x_train)
+
+    # prediction by comparision to all labels
 
     correct = 0.
     for testindex in range(len(x_test)):
@@ -72,8 +79,17 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20,20), bottle_neck=
         if y_train[i][0] == y_test[testindex][0]:
             correct += 1.
     precision = correct / len(x_test)
-    print("Precision by labels: " + str(round(precision, 3)))
+    print("Precision by labels with nearest neighbor: " + str(round(precision, 3)))
 
+    correct = 0.
+    for testindex in range(len(x_test)):
+        neighbor = encoder.predict(x_test[testindex: testindex+1,:])
+        mostlikely = find_nearest_class(neighbor, neighborhood, y_train)
+        if mostlikely == y_test[testindex][0]:
+            correct += 1.
+
+    precision = correct / len(x_test)
+    print("Precision by labels with nearest class: " + str(round(precision, 3)))
 
 def compare_autoencoder_outputs(imgs, model, indices=[0], img_dim=(28, 28)):
     pred = model.predict(imgs)
@@ -89,6 +105,9 @@ def load_smileys_dataset(filename="./smiley.pkl", n_train=900, n_test=99,img_dim
     :returns: (x_train, y_train) , (x_test, y_test)
     """
     images, labels = cPickle.load(open(filename, "rb"))
+    shuffled_idxs = np.random.permutation(images.shape[0])[:]
+    images = images[shuffled_idxs]
+    labels = labels[shuffled_idxs]
 
     x_train = images[0:n_train, :]
     y_train = labels[0:n_train, :]

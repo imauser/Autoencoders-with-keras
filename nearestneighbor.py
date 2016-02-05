@@ -26,3 +26,29 @@ def find_nearest_neighbor_index(neighbor, neighborhood):
         if n_dist < nearest_neighbor[1]:
             nearest_neighbor = (i, n_dist)
     return nearest_neighbor[0]
+
+
+def find_nearest_class(neighbor, neighborhood, neighborhood_labels):
+    """ calculates lowest distance to a dictionary
+    >>> find_nearest_class([1,1],[[1,2],[5,5],[2,2]], [1,2,3])
+    1
+    >>> find_nearest_class([1,1],[[1,2], [1,2], [1,2],[5,5],[2,2]], [1, 1, 1 ,2,3])
+    1
+    """
+    classes = dict()
+    nof_classes = dict()
+    for i in range(len(neighborhood)):
+        act_class = neighborhood_labels[i][0]
+        if act_class in classes:
+            classes[act_class] += neighbor_distance(neighbor, neighborhood[i])
+            nof_classes[act_class] += 1
+        else:
+            classes[act_class] = neighbor_distance(neighbor, neighborhood[i])
+            nof_classes[act_class] = 1
+    means = []
+
+    for k,v in classes.iteritems():
+        means.append(v/nof_classes[k])
+
+    return np.argmin(means)
+
