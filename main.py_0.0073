@@ -28,10 +28,10 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
     funcion docsting
     """
     np.random.seed(1337)  # for reproducibility
-    encoder_dim = 500
-    decoder_dim = 500
+    encoder_dim = 1000
+    decoder_dim = 1000
     batch_size = 150
-    nb_epoch = 1000
+    nb_epoch = 200
     activation_fnc = 'sigmoid'
     init_fnc = 'he_normal'
     loss_fnc = 'mean_squared_error'

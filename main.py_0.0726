@@ -32,7 +32,7 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
     decoder_dim = 500
     batch_size = 150
     nb_epoch = 1000
-    activation_fnc = 'sigmoid'
+    activation_fnc = 'relu'
     init_fnc = 'he_normal'
     loss_fnc = 'mean_squared_error'
     optimizer_fnc = Adam()

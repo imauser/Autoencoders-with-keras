@@ -21,7 +21,7 @@ import cPickle
 
 
 def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
-                         bottle_neck=50,
+                         bottle_neck=32,
                          classes={1: "happy", 2: "sad",
                                   3: "frustrated", 4: "winking"}):
     """
@@ -31,7 +31,7 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
     encoder_dim = 500
     decoder_dim = 500
     batch_size = 150
-    nb_epoch = 1000
+    nb_epoch = 200
     activation_fnc = 'sigmoid'
     init_fnc = 'he_normal'
     loss_fnc = 'mean_squared_error'
