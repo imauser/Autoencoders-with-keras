@@ -31,7 +31,7 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
     encoder_dim = 500
     decoder_dim = 500
     batch_size = 150
-    nb_epoch = 1000
+    nb_epoch = 10
     activation_fnc = 'sigmoid'
     init_fnc = 'he_normal'
     loss_fnc = 'mean_squared_error'
@@ -72,8 +72,13 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
     for testindex in range(len(x_test)):
         neighbor = encoder.predict(x_test[testindex: testindex+1, :])
         i = find_nearest_neighbor_index(neighbor, neighborhood)
-        if y_train[i][0] == y_test[testindex][0]:
-            correct += 1.
+        if hasattr(y_train[i], '__contains__'):
+            if y_train[i][0] == y_test[testindex][0]:
+                correct += 1.
+        else:
+            if y_train[i] == y_test[testindex]:
+                        correct += 1.
+
     precision = correct / len(x_test)
     print("Precision by labels with nearest neighbor: " +
           str(round(precision, 3)))
@@ -82,8 +87,13 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
     for testindex in range(len(x_test)):
         neighbor = encoder.predict(x_test[testindex: testindex+1, :])
         mostlikely = find_nearest_class(neighbor, neighborhood, y_train)
-        if mostlikely == y_test[testindex][0]:
-            correct += 1.
+
+        if hasattr(y_train[i], '__contains__'):
+            if mostlikely == y_test[testindex][0]:
+                correct += 1.
+        else:
+            if mostlikely == y_test[testindex]:
+                        correct += 1.
 
     precision = correct / len(x_test)
     print("Precision by labels with nearest class: " +
@@ -126,7 +136,17 @@ def load_smileys_dataset(filename="./smiley.pkl", n_train=900,
 
     return (x_train, y_train), (x_test, y_test)
 
+def load_mnist():
+    (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
+    X_train = X_train.reshape(-1, 784)
+    X_test = X_test.reshape(-1, 784)
+    X_train = X_train.astype("float32") / 255.0
+    X_test = X_test.astype("float32") / 255.0
+    return (X_train, Y_train), (X_test, Y_test)
+
+
 
 if __name__ == "__main__":
-    data = load_smileys_dataset()
-    run_deep_autoencoder(dataset=data)
+    #data = load_smileys_dataset()
+    data = load_mnist()
+    run_deep_autoencoder(dataset=data, img_dim=28**2, img_shape=(28, 28), classes={key: key for key in range(10)})

@@ -38,17 +38,26 @@ def find_nearest_class(neighbor, neighborhood, neighborhood_labels):
     classes = dict()
     nof_classes = dict()
     for i in range(len(neighborhood)):
-        act_class = neighborhood_labels[i][0]
+        act_class = 0
+        if hasattr(neighborhood_labels[i], '__contains__'):
+            act_class = neighborhood_labels[i][0]
+        else:
+            act_class = neighborhood_labels[i]
+
         if act_class in classes:
             classes[act_class] += neighbor_distance(neighbor, neighborhood[i])
             nof_classes[act_class] += 1
         else:
             classes[act_class] = neighbor_distance(neighbor, neighborhood[i])
             nof_classes[act_class] = 1
-    means = []
+    from sys import maxsize
+    key, smallest = -1, maxsize
 
     for k,v in classes.iteritems():
-        means.append(v/nof_classes[k])
+        mean = v/nof_classes[k]
+        if mean < smallest:
+            smallest = mean
+            key = k
 
-    return np.argmin(means)
+    return key
 
