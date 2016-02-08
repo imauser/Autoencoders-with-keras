@@ -3,7 +3,7 @@ import sys
 with open(sys.argv[1]) as f:
     lines = f.readlines()
 
-digits = 5
+digits = 6
 
 train_error = []
 validation_error = []
@@ -12,7 +12,10 @@ for line in lines:
     if " loss:" in line:
         pos = line.find(" loss:")
         offset = len(" loss:") + 1
-        train_error.append(float(line[pos+offset:pos+offset+digits]))
+        realdigits = digits
+        if line[pos+offset+digits] == "e":
+            realdigits += 4
+        train_error.append(float(line[pos+offset:pos+offset+realdigits]))
     if " val_loss:" in line:
         pos = line.find(" val_loss:")
         offset = len(" val_loss:") + 1

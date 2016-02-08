@@ -31,8 +31,8 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
     encoder_dim = 500
     decoder_dim = 500
     batch_size = 150
-    nb_epoch = 10
-    activation_fnc = 'sigmoid'
+    nb_epoch = 10000
+    activation_fnc = 'tanh'
     init_fnc = 'he_normal'
     loss_fnc = 'mean_squared_error'
     optimizer_fnc = Adam()
@@ -54,7 +54,7 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
     model.compile(loss=loss_fnc,
                   optimizer=optimizer_fnc)
     model.fit(x_train, x_train, nb_epoch=nb_epoch, batch_size=batch_size,
-              validation_data=(x_test, x_test), show_accuracy=False)
+              validation_data=(x_test, x_test), show_accuracy=False, verbose=1)
 
     encoder = Sequential()
     for i, layer in enumerate(model.layers):
@@ -147,6 +147,6 @@ def load_mnist():
 
 
 if __name__ == "__main__":
-    #data = load_smileys_dataset()
-    data = load_mnist()
-    run_deep_autoencoder(dataset=data, img_dim=28**2, img_shape=(28, 28), classes={key: key for key in range(10)})
+    data = load_smileys_dataset()
+    # data = load_mnist()
+    run_deep_autoencoder(dataset=data, img_dim=20**2, img_shape=(20, 20), classes={key: key for key in range(10)})
