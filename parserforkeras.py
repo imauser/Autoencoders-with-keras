@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python2.7
 import sys
 import os
 import matplotlib.pyplot as plt
@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 def read_file(filename):
     with open(filename) as f:
-        lines = f.readlines()
+        lines = f.read().split("\n")
 
     digits = 6
 
@@ -26,6 +26,10 @@ def read_file(filename):
             offset = len(" val_loss:") + 1
             validation_error.append(float(line[pos+offset:pos+offset+digits]))
 
+    print("errors for " + filename)
+    print("lines: " + str(len(lines)))
+    print("trainlen: " + str(len(train_error)))
+    print("vallen: " + str(len(validation_error)))
     return train_error, validation_error
 
 
@@ -37,8 +41,8 @@ def plot(errors, output_name):
     ax.set_ylabel("Error")
     plt.yscale('log')
     for key in errors:
-        ax.plot(errors[key][0], label="Training error" + key)
-        ax.plot(errors[key][1], label="Validation error" + key)
+        ax.plot(errors[key][0], label="Training error" + key[0:len(key)-4])
+        ax.plot(errors[key][1], label="Validation error" + key[0:len(key)-4])
     lgd = ax.legend(loc=2, bbox_to_anchor=(1.05, 1), borderaxespad=0.)
     fig.savefig(output_name, bbox_extra_artists=(lgd,), bbox_inches='tight')
 
@@ -46,7 +50,13 @@ if __name__ == "__main__":
     dirname = sys.argv[1]
     os.chdir(dirname)
     errors = dict()
+<<<<<<< HEAD
     for f in os.listdir():
             if f.endswith(".txt"):
                 errors[f] = read_file(f)
+=======
+    for file in os.listdir("."):
+            if file.endswith(".txt"):
+                errors[file] = read_file(file)
+>>>>>>> 86410ec5af0dd5e513fb770d6ef6516f485c1075
     plot(errors, "output" + ".png")
