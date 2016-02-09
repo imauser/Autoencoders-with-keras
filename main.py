@@ -10,7 +10,9 @@ import matplotlib.pyplot as plt
 from keras.datasets import mnist
 from keras.models import Sequential
 from keras.optimizers import RMSprop
+from keras.optimizers import SGD
 from keras.optimizers import Adam
+from keras.optimizers import Adagrad
 from keras.layers.core import Dense
 
 from random import shuffle
@@ -21,21 +23,24 @@ import cPickle
 
 
 def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
-                         bottle_neck=50,
+                         bottle_neck=40,
                          classes={1: "happy", 2: "sad",
                                   3: "frustrated", 4: "winking"}):
     """
     funcion docsting
     """
-    np.random.seed(1337)  # for reproducibility
+    #np.random.seed(1337)  # for reproducibility
     encoder_dim = 500
     decoder_dim = 500
     batch_size = 150
-    nb_epoch = 10000
-    activation_fnc = 'tanh'
+    nb_epoch = 1
+    activation_fnc = 'sigmoid'
     init_fnc = 'he_normal'
     loss_fnc = 'mean_squared_error'
     optimizer_fnc = Adam()
+#   optimizer_fnc = SGD(lr=0.01, momentum=0.0, decay=0.0, nesterov=False)
+#    optimizer_fnc = RMSprop(lr=0.001, rho=0.9, epsilon=1e-06)
+#    optimizer_fnc = Adagrad(lr=0.01, epsilon=1e-06)
 
     # the data, shuffled and split between train and test sets
     (x_train, y_train), (x_test, y_test) = dataset
@@ -64,40 +69,42 @@ def run_deep_autoencoder(dataset, img_dim=20**2, img_shape=(20, 20),
 
     encoder.compile(loss=loss_fnc, optimizer=optimizer_fnc)
 
-    neighborhood = encoder.predict(x_train)
+    # neighborhood = encoder.predict(x_train)
 
-    # prediction by comparision to all labels
+    # # prediction by comparision to all labels
 
-    correct = 0.
-    for testindex in range(len(x_test)):
-        neighbor = encoder.predict(x_test[testindex: testindex+1, :])
-        i = find_nearest_neighbor_index(neighbor, neighborhood)
-        if hasattr(y_train[i], '__contains__'):
-            if y_train[i][0] == y_test[testindex][0]:
-                correct += 1.
-        else:
-            if y_train[i] == y_test[testindex]:
-                        correct += 1.
+    # correct = 0.
+    # for testindex in range(len(x_test)):
+    #     neighbor = encoder.predict(x_test[testindex: testindex+1, :])
+    #     i = find_nearest_neighbor_index(neighbor, neighborhood)
+    #     if hasattr(y_train[i], '__contains__'):
+    #         if y_train[i][0] == y_test[testindex][0]:
+    #             correct += 1.
+    #     else:
+    #         if y_train[i] == y_test[testindex]:
+    #                     correct += 1.
 
-    precision = correct / len(x_test)
-    print("Precision by labels with nearest neighbor: " +
-          str(round(precision, 3)))
+    # precision = correct / len(x_test)
+    # print("Precision by labels with nearest neighbor: " +
+    #       str(round(precision, 3)))
 
-    correct = 0.
-    for testindex in range(len(x_test)):
-        neighbor = encoder.predict(x_test[testindex: testindex+1, :])
-        mostlikely = find_nearest_class(neighbor, neighborhood, y_train)
+    # correct = 0.
+    # for testindex in range(len(x_test)):
+    #     neighbor = encoder.predict(x_test[testindex: testindex+1, :])
+    #     mostlikely = find_nearest_class(neighbor, neighborhood, y_train)
 
-        if hasattr(y_train[i], '__contains__'):
-            if mostlikely == y_test[testindex][0]:
-                correct += 1.
-        else:
-            if mostlikely == y_test[testindex]:
-                        correct += 1.
+    #     if hasattr(y_train[i], '__contains__'):
+    #         if mostlikely == y_test[testindex][0]:
+    #             correct += 1.
+    #     else:
+    #         if mostlikely == y_test[testindex]:
+    #                     correct += 1.
 
-    precision = correct / len(x_test)
-    print("Precision by labels with nearest class: " +
-          str(round(precision, 3)))
+    # precision = correct / len(x_test)
+    # print("Precision by labels with nearest class: " +
+    #       str(round(precision, 3)))
+
+    compare_autoencoder_outputs(x_test, model, indices=range(2))
 
 
 def compare_autoencoder_outputs(imgs, model, indices=[0], img_dim=(28, 28)):
@@ -147,6 +154,7 @@ def load_mnist():
 
 
 if __name__ == "__main__":
-    data = load_smileys_dataset()
-    # data = load_mnist()
-    run_deep_autoencoder(dataset=data, img_dim=20**2, img_shape=(20, 20), classes={key: key for key in range(10)})
+    # data = load_smileys_dataset()
+    data = load_mnist()
+    #run_deep_autoencoder(dataset=data)
+    run_deep_autoencoder(dataset=data, img_dim=28**2, img_shape=(28, 28), classes={key: key for key in range(10)})
