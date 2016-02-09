@@ -35,7 +35,7 @@ def read_file(filename):
 
 def plot(errors, output_name):
 
-    fig = plt.figure(1)
+    fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_xlabel("Epochs")
     ax.set_ylabel("Error")
@@ -50,7 +50,13 @@ if __name__ == "__main__":
     dirname = sys.argv[1]
     os.chdir(dirname)
     errors = dict()
+<<<<<<< HEAD
+    for f in os.listdir():
+            if f.endswith(".txt"):
+                errors[f] = read_file(f)
+=======
     for file in os.listdir("."):
             if file.endswith(".txt"):
                 errors[file] = read_file(file)
+>>>>>>> 86410ec5af0dd5e513fb770d6ef6516f485c1075
     plot(errors, "output" + ".png")
